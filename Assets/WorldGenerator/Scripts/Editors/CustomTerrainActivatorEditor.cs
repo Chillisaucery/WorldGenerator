@@ -7,8 +7,10 @@ using UnityEngine;
 [CanEditMultipleObjects]
 public class CustomTerrainActivatorEditor : Editor
 {
-    bool showRandom = false;
     bool showPerlin = false;
+    bool showVoronoi = false;
+    bool showSmooth = false;
+    bool showMidpointDisplacement = false;
 
     public override void OnInspectorGUI()
     {
@@ -21,16 +23,6 @@ public class CustomTerrainActivatorEditor : Editor
 
 
 
-        showRandom = EditorGUILayout.Foldout(showRandom, "Random");
-
-        if (showRandom)
-        {
-            if (GUILayout.Button("RandomHeight"))
-            {
-                customTerrainActivator.RandomHeight();
-            }
-        }
-
         showPerlin = EditorGUILayout.Foldout(showPerlin, "Perlin");
 
         if (showPerlin)
@@ -38,6 +30,36 @@ public class CustomTerrainActivatorEditor : Editor
             if (GUILayout.Button("PerlinNoise"))
             {
                 customTerrainActivator.PerlinNoise();
+            }
+        }
+
+        showVoronoi = EditorGUILayout.Foldout(showVoronoi, "Voronoi");
+
+        if (showVoronoi)
+        {
+            if (GUILayout.Button("Voronoi"))
+            {
+                customTerrainActivator.VoronoiPeaks();
+            }
+        }
+
+        showSmooth = EditorGUILayout.Foldout(showSmooth, "Smooth");
+
+        if (showSmooth)
+        {
+            if (GUILayout.Button("Smooth"))
+            {
+                customTerrainActivator.Smooth();
+            }
+        }
+
+        showMidpointDisplacement = EditorGUILayout.Foldout(showMidpointDisplacement, "Midpoint Displacement");
+
+        if (showMidpointDisplacement)
+        {
+            if (GUILayout.Button("Midpoint Displacement"))
+            {
+                customTerrainActivator.MidpointDisplacement();
             }
         }
     }

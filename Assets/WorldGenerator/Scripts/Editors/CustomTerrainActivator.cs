@@ -14,11 +14,6 @@ public class CustomTerrainActivator : MonoBehaviour
         customTerrain = GetComponent<CustomTerrain>();
     }
 
-    public void RandomHeight()
-    {
-        customTerrain.RandomHeight();
-    }
-
     public void ResetHeight()
     {
         customTerrain.ResetHeight();
@@ -27,5 +22,20 @@ public class CustomTerrainActivator : MonoBehaviour
     internal void PerlinNoise()
     {
         customTerrain.PerlinNoise();
+    }
+
+    internal void VoronoiPeaks()
+    {
+        customTerrain.Voronoi();
+    }
+
+    internal void Smooth()
+    {
+        customTerrain.Smooth();
+    }
+
+    internal void MidpointDisplacement()
+    {
+        customTerrain.MidPointDisplacement();
     }
 }
