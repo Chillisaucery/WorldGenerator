@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using UnityEditor;
 using UnityEngine;
 using static Constants;
 
@@ -30,15 +31,29 @@ public class CustomTerrain : MonoBehaviour
 
     [Header("Mid Point Displacement")]
     [SerializeField]
-    private int MPDroughness = 3;
+    private int MPDRoughness = 3;
     [SerializeField]
-    private float MPDheightMin = 0.1f, MPDheightMax = 0.7f, MPDheightDampenerPower = 2, MPDheightScale = 0.5f;
+    private float MPDHeightMin = 0.1f, MPDHeightMax = 0.7f, MPDHeightDampenerPower = 2, MPDHeightScale = 0.5f;
+
+    [Header("Texturing")]
+    [SerializeField]
+    private List<SplatHeightData> splatHeights = new List<SplatHeightData>();
+
+    [Header("Vegetation")]
+    [SerializeField, Range (0,10000)]
+    private int maxTrees = 5000;
+    [SerializeField, Range (0, 50)]
+    private int treeSpacing = 5;
+
+    [SerializeField]
+    private List<Vegetation> vegetation = new List<Vegetation>();
 
 
 
     //Non-Serialized cached object
     Terrain terrain = null;
     TerrainData terrainData = null;
+
 
 
     private void Initialize()
@@ -203,9 +218,9 @@ public class CustomTerrain : MonoBehaviour
         float[,] generatedHeightMap = InstantiateHeightMap(true, terrainData);
         int width = terrainData.heightmapResolution - 1;
         int squareSize = width;
-        float heightMin = MPDheightMin;
-        float heightMax = MPDheightMax;
-        float heightDampener = (float)Mathf.Pow(MPDheightDampenerPower, -1 * MPDroughness);
+        float heightMin = MPDHeightMin;
+        float heightMax = MPDHeightMax;
+        float heightDampener = (float)Mathf.Pow(MPDHeightDampenerPower, -1 * MPDRoughness);
 
 
         int cornerX, cornerY;
@@ -294,7 +309,7 @@ public class CustomTerrain : MonoBehaviour
         {
             for (int j = 0; j < terrainData.heightmapResolution; j++)
             {
-                generatedHeightMap[i, j] *= MPDheightScale;
+                generatedHeightMap[i, j] *= MPDHeightScale;
                 resultHeightMap[i,j] += generatedHeightMap[i, j];
             }
         }
@@ -323,9 +338,163 @@ public class CustomTerrain : MonoBehaviour
 
 
 
-    public static float [,] InstantiateHeightMap(bool shouldReset, TerrainData terrainData)
+    public void GenerateTexture()
     {
-        float[,] heightMap = new float[0,0];
+        Initialize();
+
+        TerrainLayer[] terrainLayers = new TerrainLayer[splatHeights.Count];
+        int splatIndex = 0;
+
+        DeleteAssetsInFolder(GENERATED_ASSET_FOLDER_PATH);
+        foreach (SplatHeightData sh in splatHeights)
+        {
+            terrainLayers[splatIndex] = new TerrainLayer();
+
+            terrainLayers[splatIndex].tileOffset = sh.tileOffset;
+            terrainLayers[splatIndex].tileSize = sh.tileSize;
+
+            terrainLayers[splatIndex].diffuseTexture = sh.texture;
+            terrainLayers[splatIndex].diffuseTexture.Apply(true);
+
+            AssetDatabase.CreateAsset(terrainLayers[splatIndex], GENERATED_ASSET_FOLDER_PATH + "/" + sh.texture.name);
+            terrainLayers[splatIndex].name = sh.texture.name;
+
+            splatIndex++;
+        }
+
+        terrainData.SetTerrainLayersRegisterUndo(terrainLayers, nameof(TerrainLayerUndo));
+
+        float[,] heightMap = terrainData.GetHeights(0, 0, terrainData.heightmapResolution, terrainData.heightmapResolution);
+        float[,,] splatmapData = new float[terrainData.alphamapWidth, terrainData.alphamapHeight, terrainData.alphamapLayers];
+
+        for (int y = 0; y < terrainData.alphamapHeight; y++)
+        {
+            for (int x = 0; x < terrainData.alphamapWidth; x++)
+            {
+                float[] splat = new float[terrainData.alphamapLayers];
+                for (int i = 0; i < splatHeights.Count; i++)
+                {
+                    float noise = Mathf.PerlinNoise(x * splatHeights[i].splatNoiseXScale, y * splatHeights[i].splatNoiseYScale)
+                                       * splatHeights[i].splatNoiseZScaler;
+                    float offset = splatHeights[i].splatOffset + noise;
+                    float startHeight = splatHeights[i].minHeight - offset;
+                    float stopHeight = splatHeights[i].maxHeight + offset;
+
+                    float steepness = terrainData.GetSteepness(y / (float)terrainData.alphamapHeight,x / (float)terrainData.alphamapWidth);
+
+                    if ((heightMap[x, y] >= startHeight && heightMap[x, y] <= stopHeight) &&
+                        (steepness >= splatHeights[i].minSlope && steepness <= splatHeights[i].maxSlope))
+                    {
+                        splat[i] = 1;
+                    }
+                }
+                NormalizeVector(splat);
+                for (int j = 0; j < splatHeights.Count; j++)
+                {
+                    splatmapData[x, y, j] = splat[j];
+                }
+            }
+        }
+        terrainData.SetAlphamaps(0, 0, splatmapData);
+    }
+
+    public void PlantVegetation()
+    {
+        Initialize();
+
+        TreePrototype[] newTreePrototypes = new TreePrototype[vegetation.Count];
+
+        for (int treeIndex = 0; treeIndex < vegetation.Count; treeIndex++)
+        {
+            newTreePrototypes[treeIndex] = new TreePrototype();
+            newTreePrototypes[treeIndex].prefab = vegetation[treeIndex].Mesh;
+        }
+        terrainData.treePrototypes = newTreePrototypes;
+
+        List<TreeInstance> allVegetation = new List<TreeInstance>();
+        
+        for (int x = 0; x < terrainData.size.x; x += treeSpacing)
+        {
+            for (int z = 0; z < terrainData.size.z; z += treeSpacing)
+            {
+                for (int treeIndex = 0; treeIndex < terrainData.treePrototypes.Length; treeIndex++)
+                {
+                    float thisHeight = terrainData.GetHeight(x, z) / terrainData.size.y;
+                    float steepness = terrainData.GetSteepness(x / terrainData.size.x, z / terrainData.size.z);
+
+                    bool doesFitInDensity = Random.Range(0.0f, 1.0f) > vegetation[treeIndex].Density;
+                    bool doesFitHeight = (thisHeight >= vegetation[treeIndex].Height.min && thisHeight <= vegetation[treeIndex].Height.max);
+                    bool doesFitSteepness = (steepness >= vegetation[treeIndex].Slope.min && steepness <= vegetation[treeIndex].Slope.max);
+
+                    if ( doesFitInDensity && doesFitHeight && doesFitSteepness)
+                    {
+                        TreeInstance instance = new TreeInstance();
+
+                        float xPos = (x + Random.Range(-vegetation[treeIndex].RandomStrength, vegetation[treeIndex].RandomStrength)) / terrainData.size.x;
+                        float zPos = (z + Random.Range(-vegetation[treeIndex].RandomStrength, vegetation[treeIndex].RandomStrength)) / terrainData.size.z;
+                        float yPos = terrainData.GetHeight(x, z) / terrainData.size.y;
+
+                        xPos = xPos * terrainData.size.x / terrainData.alphamapWidth;
+                        zPos = zPos * terrainData.size.z / terrainData.alphamapHeight;
+
+                        instance.position = new Vector3(xPos, yPos, zPos);
+
+                        Vector3 treeWorldPos = new Vector3(instance.position.x * terrainData.size.x,
+                                                            instance.position.y * terrainData.size.y,
+                                                            instance.position.z * terrainData.size.z) + this.transform.position;
+
+                        RaycastHit hit;
+                        int layerMask = LayerMask.NameToLayer(TERRAIN_LAYER_NAME);
+
+                        if (Physics.Raycast(treeWorldPos + new Vector3(0, 20, 0), Vector3.down, out hit, 200) ||
+                            Physics.Raycast(treeWorldPos - new Vector3(0, 20, 0), Vector3.up, out hit, 200))
+                        {
+                            if (hit.transform.gameObject.layer == layerMask)
+                            {
+                                float treeHeight = (hit.point.y - transform.position.y) / terrainData.size.y;
+
+                                instance.position = new Vector3(instance.position.x, treeHeight, instance.position.z);
+
+                                instance.rotation = Random.Range(0, 360);
+                                instance.prototypeIndex = treeIndex;
+                                instance.color = Color.Lerp(vegetation[treeIndex].Colors.color1, vegetation[treeIndex].Colors.color2, Random.Range(0.0f, 1.0f));
+                                instance.lightmapColor = vegetation[treeIndex].Colors.lightmap;
+                                float scale = Random.Range(vegetation[treeIndex].Scale.min, vegetation[treeIndex].Scale.max);
+                                instance.heightScale = scale;
+                                instance.widthScale = scale;
+
+                                allVegetation.Add(instance);
+                                if (allVegetation.Count >= maxTrees) goto FINISH;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+    FINISH:
+        terrainData.treeInstances = allVegetation.ToArray();
+    }
+
+
+
+    void NormalizeVector(float[] v)
+    {
+        float total = 0;
+        for (int i = 0; i < v.Length; i++)
+        {
+            total += v[i];
+        }
+
+        for (int i = 0; i < v.Length; i++)
+        {
+            v[i] /= total;
+        }
+    }
+
+    public static float[,] InstantiateHeightMap(bool shouldReset, TerrainData terrainData)
+    {
+        float[,] heightMap = new float[0, 0];
 
         if (!shouldReset)
             heightMap = terrainData.GetHeights(0, 0, terrainData.heightmapResolution, terrainData.heightmapResolution);
@@ -352,6 +521,28 @@ public class CustomTerrain : MonoBehaviour
             }
         }
         return neighbours;
+    }
+
+    private void DeleteAssetsInFolder(string folderPath)
+    {
+        string[] foundAssets = AssetDatabase.FindAssets("", new string[1] { folderPath });
+
+        if (foundAssets.Length == 0)
+        {
+            return; //Do nothing
+
+        }
+
+        foreach (var asset in foundAssets)
+        {
+            var path = AssetDatabase.GUIDToAssetPath(asset);
+            AssetDatabase.DeleteAsset(path);
+        }
+    }
+
+    private void TerrainLayerUndo()
+    {
+        //Not yet implemented, only is used for the SetTerrainLayer function.
     }
 }
 
@@ -402,4 +593,52 @@ public class VoronoiData
     public float MaxHeight { get => maxHeight; private set => maxHeight = value; }
     public float MinHeight { get => minHeight; private set => minHeight = value; }
     public (float min, float max) Scale { get => (minScale, maxScale); private set => (minScale, maxScale) = value; }
+}
+
+[System.Serializable]
+public class SplatHeightData
+{
+    public Texture2D texture = null;
+    public float minHeight = 0.1f, maxHeight = 0.2f;
+    public float minSlope = 0, maxSlope = 1.5f;
+    public Vector2 tileOffset = new Vector2(0, 0);
+    public Vector2 tileSize = new Vector2(50, 50);
+    public float splatOffset = 0.1f;
+    public float splatNoiseXScale = 0.01f, splatNoiseYScale = 0.01f, splatNoiseZScaler = 0.1f;
+}
+
+[System.Serializable]
+public class Vegetation
+{
+    [SerializeField]
+    private GameObject mesh;
+
+    [SerializeField, Range (0,1)]
+    private float minHeight = 0.1f, maxHeight = 0.2f;
+
+    [SerializeField, Range (0,90)]
+    private float minSlope = 0, maxSlope = 90;
+
+    [SerializeField, Range (0, 100)]
+    private float minScale = 0.5f, maxScale = 1.0f;
+
+    [SerializeField]
+    private Color colour1 = Color.white, colour2 = Color.white, lightmapColor = Color.white;
+
+    [SerializeField]
+    private float density = 0.5f, randomStrength = 10f;
+
+
+
+    public GameObject Mesh { get => mesh; set => mesh = value; }
+    public (float min, float max) Height { get => (minHeight, maxHeight); set => (minHeight, maxHeight) = value; }
+    public (float min, float max) Slope { get => (minSlope, maxSlope); set => (minSlope, maxSlope) = value; }
+    public (float min, float max) Scale { get => (minScale, maxScale); set => (minScale, maxScale) = value; }
+    public (Color color1, Color color2, Color lightmap) Colors
+    {
+        get => (colour1, colour2, lightmapColor);
+        set => (colour1, colour2, lightmapColor) = value;
+    }
+    public float Density { get => density; set => density = value; }
+    public float RandomStrength { get => randomStrength; set => randomStrength = value; }
 }

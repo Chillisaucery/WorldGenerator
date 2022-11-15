@@ -4,13 +4,15 @@ using UnityEditor;
 using UnityEngine;
 
 [CustomEditor(typeof(CustomTerrainActivator))]
-[CanEditMultipleObjects]
+//[CanEditMultipleObjects]
 public class CustomTerrainActivatorEditor : Editor
 {
     bool showPerlin = false;
     bool showVoronoi = false;
     bool showSmooth = false;
     bool showMidpointDisplacement = false;
+    bool showTexture = false;
+    bool showVegetation = false;
 
     public override void OnInspectorGUI()
     {
@@ -60,6 +62,26 @@ public class CustomTerrainActivatorEditor : Editor
             if (GUILayout.Button("Midpoint Displacement"))
             {
                 customTerrainActivator.MidpointDisplacement();
+            }
+        }
+
+        showTexture = EditorGUILayout.Foldout(showTexture, "Texture");
+
+        if (showTexture)
+        {
+            if (GUILayout.Button("Texture"))
+            {
+                customTerrainActivator.Texture();
+            }
+        }
+
+        showVegetation = EditorGUILayout.Foldout(showVegetation, "Vegetation");
+
+        if (showVegetation)
+        {
+            if (GUILayout.Button("Vegetation"))
+            {
+                customTerrainActivator.PlantVegetation();
             }
         }
     }

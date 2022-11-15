@@ -38,4 +38,14 @@ public class CustomTerrainActivator : MonoBehaviour
     {
         customTerrain.MidPointDisplacement();
     }
+
+    internal void Texture()
+    {
+        customTerrain.GenerateTexture();
+    }
+
+    internal void PlantVegetation()
+    {
+        customTerrain.PlantVegetation();
+    }
 }
