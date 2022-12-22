@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
 
-[CustomEditor(typeof(CustomTerrainActivator))]
+[CustomEditor(typeof(TerrainBaseActivator))]
 //[CanEditMultipleObjects]
-public class CustomTerrainActivatorEditor : Editor
+public class TerrainBaseEditor : Editor
 {
     bool showPerlin = false;
     bool showVoronoi = false;
@@ -16,7 +16,7 @@ public class CustomTerrainActivatorEditor : Editor
 
     public override void OnInspectorGUI()
     {
-        CustomTerrainActivator customTerrainActivator = (CustomTerrainActivator)target;
+        TerrainBaseActivator customTerrainActivator = (TerrainBaseActivator)target;
 
         if (GUILayout.Button("ResetHeight"))
         {

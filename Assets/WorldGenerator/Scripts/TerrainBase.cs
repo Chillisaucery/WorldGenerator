@@ -2,10 +2,12 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
+using UnityEngine.UIElements;
 using static Constants;
+using static Utils;
 
 [RequireComponent(typeof(Terrain))]
-public class CustomTerrain : MonoBehaviour
+public class TerrainBase : MonoBehaviour
 {
     //Serialize Field
     [Header("Terrain setting"), SerializeField]
@@ -44,9 +46,8 @@ public class CustomTerrain : MonoBehaviour
     private int maxTrees = 5000;
     [SerializeField, Range (0, 50)]
     private int treeSpacing = 5;
-
     [SerializeField]
-    private List<Vegetation> vegetation = new List<Vegetation>();
+    private List<VegetationData> vegetation = new List<VegetationData>();
 
 
 
@@ -156,13 +157,7 @@ public class CustomTerrain : MonoBehaviour
                     if (!(x == peakPos.x && y == peakPos.z))    //Will not do anything to the peak itself
                     {
                         float distance = Vector2.Distance(peakLocation, new Vector2(x, y)) / maxDistance * scale;
-                        float height = 0;
-
-                        if (distance<=1 && distance >=0)
-                        {
-                            height = peakHeight * ((Mathf.Cos(Mathf.Pow(distance, smoothness) * Mathf.PI) * voronoiData.Amplitude
-                                        + (1 - voronoiData.Amplitude)));
-                        }
+                        float height = peakHeight * VoronoiSmooth(distance, smoothness, voronoiData.Amplitude);
 
                         if (heightMap[x, y] < height)
                             heightMap[x, y] = height;
@@ -186,8 +181,13 @@ public class CustomTerrain : MonoBehaviour
 
         terrainData.SetHeights(0, 0, heightMap);
     }
-    
+
     public void Smooth()
+    {
+        Smooth(smoothRadius);
+    }
+
+    public void Smooth(int smoothRadius)
     {
         Initialize();
 
@@ -503,26 +503,6 @@ public class CustomTerrain : MonoBehaviour
         return heightMap;
     }
 
-    List<Vector2> GenerateNeighbours(Vector2 pos, int radius, int resolution)
-    {
-        List<Vector2> neighbours = new List<Vector2>();
-
-        for (int y = -radius; y <= radius; y++)
-        {
-            for (int x = -radius; x <= radius; x++)
-            {
-                if (!(x == 0 && y == 0))
-                {
-                    Vector2 nPos = new Vector2(Mathf.Clamp(pos.x + x, 0, resolution - 1),
-                                                Mathf.Clamp(pos.y + y, 0, resolution - 1));
-                    if (!neighbours.Contains(nPos))
-                        neighbours.Add(nPos);
-                }
-            }
-        }
-        return neighbours;
-    }
-
     private void DeleteAssetsInFolder(string folderPath)
     {
         string[] foundAssets = AssetDatabase.FindAssets("", new string[1] { folderPath });
@@ -608,7 +588,7 @@ public class SplatHeightData
 }
 
 [System.Serializable]
-public class Vegetation
+public class VegetationData
 {
     [SerializeField]
     private GameObject mesh;

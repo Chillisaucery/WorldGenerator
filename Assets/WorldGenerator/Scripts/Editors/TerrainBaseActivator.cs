@@ -3,15 +3,15 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-[RequireComponent(typeof(CustomTerrain))]
+[RequireComponent(typeof(TerrainBase))]
 [ExecuteInEditMode]
-public class CustomTerrainActivator : MonoBehaviour
+public class TerrainBaseActivator : MonoBehaviour
 {
-    CustomTerrain customTerrain;
+    TerrainBase customTerrain;
 
     private void Awake()
     {
-        customTerrain = GetComponent<CustomTerrain>();
+        customTerrain = GetComponent<TerrainBase>();
     }
 
     public void ResetHeight()
