@@ -3,6 +3,10 @@ using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
 
+
+
+#if UNITY_EDITOR
+
 [CustomEditor(typeof(TerrainBaseActivator))]
 //[CanEditMultipleObjects]
 public class TerrainBaseEditor : Editor
@@ -86,3 +90,5 @@ public class TerrainBaseEditor : Editor
         }
     }
 }
+
+#endif

@@ -41,7 +41,7 @@ public class TerrainBaseActivator : MonoBehaviour
 
     internal void Texture()
     {
-        customTerrain.GenerateTexture();
+        //customTerrain.GenerateTexture();
     }
 
     internal void PlantVegetation()

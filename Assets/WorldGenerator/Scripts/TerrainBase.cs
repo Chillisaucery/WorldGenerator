@@ -337,7 +337,7 @@ public class TerrainBase : MonoBehaviour
     }
 
 
-
+#if UNITY_EDITOR
     public void GenerateTexture()
     {
         Initialize();
@@ -397,6 +397,7 @@ public class TerrainBase : MonoBehaviour
         }
         terrainData.SetAlphamaps(0, 0, splatmapData);
     }
+#endif
 
     public void PlantVegetation()
     {
@@ -503,6 +504,7 @@ public class TerrainBase : MonoBehaviour
         return heightMap;
     }
 
+#if UNITY_EDITOR
     private void DeleteAssetsInFolder(string folderPath)
     {
         string[] foundAssets = AssetDatabase.FindAssets("", new string[1] { folderPath });
@@ -519,6 +521,7 @@ public class TerrainBase : MonoBehaviour
             AssetDatabase.DeleteAsset(path);
         }
     }
+#endif
 
     private void TerrainLayerUndo()
     {

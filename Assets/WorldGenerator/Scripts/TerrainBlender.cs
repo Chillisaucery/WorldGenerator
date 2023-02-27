@@ -29,6 +29,11 @@ public class TerrainBlender : MonoBehaviour
 
     private void OnEnable()
     {
+        //Blend();
+    }
+
+    public void Blend()
+    {
         heightmapTerrainPairs.Clear();
 
         int heightmapResolution = terrainList[0].terrainData.heightmapResolution;
@@ -43,7 +48,7 @@ public class TerrainBlender : MonoBehaviour
 
         amplitudeCopied = blendAmplitude;
 
-        for (int step = 0; step<maxStep; step++)
+        for (int step = 0; step < maxStep; step++)
         {
             //Blend the maps
             for (int i = 0; i < heightmapTerrainPairs.Count; i++)
@@ -77,11 +82,9 @@ public class TerrainBlender : MonoBehaviour
             });
 
             //With this, in the next iteration, the blend will focus more at the edge
-            amplitudeCopied *= stepMultiplier;   
+            amplitudeCopied *= stepMultiplier;
         }
     }
-
-
 
     private (float[,] bottomMap, float[,] topMap) BlendHeightMaps (int resolution, float[,] bottomMap, float[,] topMap, float steepness, float amplitude)
     {

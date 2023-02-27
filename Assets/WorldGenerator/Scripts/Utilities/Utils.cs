@@ -1,7 +1,9 @@
+using DG.Tweening;
 using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using static Constants;
 using Random = System.Random;
 
 public static class Utils
@@ -184,4 +186,29 @@ public static class Utils
 
     public static float DefaultVoronoiSmooth(float x) => VoronoiSmooth(x, 1, 0.5f);
     public static float SteepVoronoiSmooth(float x) => VoronoiSmooth(x, 0.5f, 0.5f);
+
+
+
+    public static IEnumerator AnimateFloatingObj(GameObject obj, int floatingRange)
+    {
+        bool isGoingUp = false;
+
+        while (true)
+        {
+            if (isGoingUp)
+                obj.transform.DOMoveY(obj.transform.position.y + floatingRange, TWEEN_DURATION).SetEase(TWEEN_EASE);
+            else obj.transform.DOMoveY(obj.transform.position.y - floatingRange, TWEEN_DURATION).SetEase(TWEEN_EASE);
+
+            yield return new WaitForSeconds(TWEEN_DURATION);
+
+            isGoingUp = !isGoingUp;
+        }
+    }
+
+    public static IEnumerator DelayedInvoke(Action action, float delay)
+    {
+        yield return new WaitForSeconds(delay);
+
+        action.Invoke();
+    }
 }
