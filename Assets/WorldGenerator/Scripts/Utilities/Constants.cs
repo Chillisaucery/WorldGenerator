@@ -2,6 +2,8 @@ using DG.Tweening;
 
 public static class Constants
 {
+    public static float GAUSSIAN_FACTOR = 2.5f;
+
     public static int MAX_PERLIN_OFFSET = 1000;
 
     public static int THERMAL_EROSION_TIME = 15;

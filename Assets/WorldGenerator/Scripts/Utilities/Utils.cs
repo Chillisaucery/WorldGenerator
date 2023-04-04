@@ -8,6 +8,40 @@ using Random = System.Random;
 
 public static class Utils
 {
+    public static List<float> NORMALIZE_LIST(List<float> values)
+    {
+        // Calculate the sum of the values in the list
+        float sum = 0f;
+        foreach (float value in values)
+        {
+            sum += value;
+        }
+
+        // If the sum is 0, return the original list
+        if (sum == 0f)
+        {
+            return values;
+        }
+
+        // Create a new list to hold the normalized values
+        List<float> normalizedValues = new List<float>(values.Count);
+
+        // Normalize each value in the list and add it to the new list
+        foreach (float value in values)
+        {
+            float normalizedValue = value / sum;
+            normalizedValues.Add(normalizedValue);
+        }
+
+        return normalizedValues;
+    }
+
+
+    public static float GAUSSIAN(float x)
+    {
+        return Mathf.Exp(-(GAUSSIAN_FACTOR * GAUSSIAN_FACTOR * x * x));
+    }
+
     /// <summary>
     /// Fractal Brownian motion
     /// </summary>
