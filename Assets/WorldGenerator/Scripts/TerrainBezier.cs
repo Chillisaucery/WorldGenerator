@@ -65,8 +65,8 @@ public class TerrainBezier : MonoBehaviour
         {
             newControlPts = MergeAllPoints(controlPoints, baseControlPoints);
             
-            newCurve = GenerateBezierCurve(step/2, newControlPts);
-            //newCurve = GenerateBSplineCurve(step/2, newControlPts, 2);
+            //newCurve = GenerateBezierCurve(step/2, newControlPts);
+            newCurve = GenerateBSplineCurve(step/2, newControlPts, 4);
 
             Vector2 contactPoint = GetPointInCurve(newCurve, controlPoints[0].x);
 
@@ -110,9 +110,6 @@ public class TerrainBezier : MonoBehaviour
 
         for (int i = 1; i < controlPoints.Count; i++)
             newControlPts.Add(controlPoints[i]);
-
-        newControlPts.ForEach(e => Debug.Log(e));
-
         return newControlPts;
     }
 
@@ -122,7 +119,7 @@ public class TerrainBezier : MonoBehaviour
         DrawBezierCurve(Color.black, curve);
 
         DrawBezierCurve(new Color(1, 0.2f, 0.6f, 0.5f), newControlPts);
-        //DrawBezierCurve(Color.red, newCurve);
+        DrawBezierCurve(Color.red, newCurve);
 
         DrawBezierCurve(Color.green, baseControlPoints);
         DrawBezierCurve(Color.yellow, controlPoints);
@@ -303,8 +300,6 @@ public class TerrainBezier : MonoBehaviour
             y += localCtrlPts[i].y * factorList[i];
         }
 
-        Debug.Log("Total Distance: " + totalDistance + " Point: " + (x,y));
-
         return new Vector2(x, y);
     }
 
@@ -318,7 +313,7 @@ public class TerrainBezier : MonoBehaviour
         return isInRange;
     }
 
-    private List<Vector2> GenerateBezierCurve(float step, List<Vector2> controlPoints)
+    public static List<Vector2> GenerateBezierCurve(float step, List<Vector2> controlPoints)
     {
         List<Vector2> curve = new List<Vector2>();
 
@@ -334,7 +329,7 @@ public class TerrainBezier : MonoBehaviour
         return curve;
     }
 
-    Vector2 GetBezierCurvePoint(float t, List<Vector2> controlPoints)
+    public static Vector2 GetBezierCurvePoint(float t, List<Vector2> controlPoints)
     {
         while (controlPoints.Count > 1)
         {
@@ -351,7 +346,7 @@ public class TerrainBezier : MonoBehaviour
         return controlPoints[0];
     }
 
-    private Vector2 GetPointInCurve(List<Vector2> curve, float x)
+    public static Vector2 GetPointInCurve(List<Vector2> curve, float x)
     {
         for (int i = 0; i < curve.Count - 1; i++)
             if (curve[i].x < x && curve[i + 1].x > x)
@@ -360,7 +355,7 @@ public class TerrainBezier : MonoBehaviour
         return Vector2.zero;
     }
 
-    private Vector2 GetPointInLine(Vector2 start, Vector2 end, float x)
+    public static Vector2 GetPointInLine(Vector2 start, Vector2 end, float x)
     {
         return (end - start).normalized * (x - start.x) + start;
     }
