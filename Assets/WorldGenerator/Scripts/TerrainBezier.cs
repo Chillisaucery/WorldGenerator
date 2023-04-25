@@ -134,19 +134,36 @@ public class TerrainBezier : MonoBehaviour
     {
         List<Vector2> newControlPts = new List<Vector2>();
 
+        //Check if it should move the control points forward
+        float distanceBetweenTiles = controlPoints[0].x - baseControlPoints[baseControlPoints.Count - 1].x;
+        float maximumDistanceAllowed = (controlPoints[0].x - baseControlPoints[0].x) * distanceToMoveBezier;
+
+        Vector2 offset = Vector2.zero;
+
+        //If it should move, also add the offset into the new control points
+        if (distanceBetweenTiles >= maximumDistanceAllowed)
+        {
+            offset = new Vector2(maximumDistanceAllowed, 0);
+
+            newControlPts.Add(baseControlPoints[0]);  
+        }
+
+
+
         for (int i = 0; i < baseControlPoints.Count-1; i++)
-            newControlPts.Add(baseControlPoints[i]);
+            newControlPts.Add(baseControlPoints[i] + offset);
+
 
 
         if (Mathf.Abs(baseControlPoints[baseControlPoints.Count -1].x - controlPoints[0].x) <= 0.1f)
         {
-            //If the points are close together on the x-axis, take the averate
+            //If the points are close together on the x-axis, take the average
             newControlPts.Add((baseControlPoints[baseControlPoints.Count - 1] + controlPoints[0]) / 2);
         }
         else
         {
             //If ther are too far, add both points
-            newControlPts.Add(baseControlPoints[baseControlPoints.Count - 1]);
+            newControlPts.Add(baseControlPoints[baseControlPoints.Count - 1] + offset);
             //newControlPts.Add((baseControlPoints[baseControlPoints.Count - 1] + controlPoints[0]) / 2);
             newControlPts.Add(controlPoints[0]);
         }

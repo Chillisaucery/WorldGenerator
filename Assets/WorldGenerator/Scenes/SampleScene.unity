@@ -3243,8 +3243,7 @@ MonoBehaviour:
   - {x: 150, y: 200}
   - {x: 200, y: 300}
   - {x: 250, y: 500}
-  - {x: 300, y: 0}
-  - {x: 350, y: 200}
+  - {x: 300, y: 200}
   shouldScaleMap: 1
   shouldScaleBaseMap: 1
   step: 0.01
@@ -3252,6 +3251,7 @@ MonoBehaviour:
   gContinuityLevel: -1
   shouldMerge: 1
   bSplineRadius: 4
+  distanceToMoveBezier: 0.3
 --- !u!154 &1550516409
 TerrainCollider:
   m_ObjectHideFlags: 0
