@@ -2,7 +2,7 @@ using DG.Tweening;
 
 public static class Constants
 {
-    public static float GAUSSIAN_FACTOR = 2.5f;
+    public static float GAUSSIAN_FACTOR = 7f;
 
     public static int MAX_PERLIN_OFFSET = 1000;
 

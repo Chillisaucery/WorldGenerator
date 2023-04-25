@@ -21,6 +21,9 @@ public class TerrainBezier : MonoBehaviour
     [SerializeField]
     List<Vector2> baseControlPoints = new List<Vector2>();
 
+    [SerializeField]
+    bool shouldScaleMap = false, shouldScaleBaseMap = false;
+
     [SerializeField, Range(0,1)]
     float step = 0.05f, g1Strength = 0.5f;
 
@@ -29,6 +32,12 @@ public class TerrainBezier : MonoBehaviour
 
     [SerializeField]
     bool shouldMerge = false;
+
+    [SerializeField]
+    int bSplineRadius = 4;
+
+    [SerializeField, Range(0,1)]
+    float distanceToMoveBezier = 0.4f;
 
     //Local variables
     List<Vector2> smoothedControlPoints = new List<Vector2>();
@@ -63,24 +72,28 @@ public class TerrainBezier : MonoBehaviour
 
         if (shouldMerge)
         {
-            newControlPts = MergeAllPoints(controlPoints, baseControlPoints);
+            newControlPts = MergerCtrlPts(controlPoints, baseControlPoints);
             
-            //newCurve = GenerateBezierCurve(step/2, newControlPts);
-            newCurve = GenerateBSplineCurve(step/2, newControlPts, 4);
+            newCurve = GenerateBezierCurve(step/2, newControlPts);
+            //newCurve = GenerateBSplineCurve(step/2, newControlPts, bSplineRadius);
 
             Vector2 contactPoint = GetPointInCurve(newCurve, controlPoints[0].x);
+            Vector2 middlePoint = (baseControlPoints[0] + controlPoints[controlPoints.Count-1])/2;
+            //Debug.Log(middlePoint);
 
-            baseCurve = ExtractCurve(newCurve, baseControlPoints[0], baseControlPoints[baseControlPoints.Count-1]);
+            baseCurve = ExtractCurve(newCurve, baseControlPoints[0], middlePoint);
             //baseCurve.Add(contactPoint);
 
-            curve = ExtractCurve(newCurve, controlPoints[0], controlPoints[controlPoints.Count-1]);
+            curve = ExtractCurve(newCurve, middlePoint, controlPoints[controlPoints.Count-1]);
             //curve.Insert(0,contactPoint);
         }
 
         (int resolution, int maxHeight) = (terrain.terrainData.heightmapResolution, Mathf.RoundToInt(terrain.terrainData.heightmapScale.y));
 
-        baseTerrain.terrainData.SetHeights(0, 0, ConvertCurveToHeightmap(new List<Vector2> (baseCurve), resolution, maxHeight));
-        terrain.terrainData.SetHeights(0, 0, ConvertCurveToHeightmap(new List<Vector2> (curve), resolution, maxHeight));
+        baseTerrain.terrainData.SetHeights(0, 0, 
+            ConvertCurveToHeightmap(new List<Vector2> (baseCurve), resolution, maxHeight, shouldScaleBaseMap));
+        terrain.terrainData.SetHeights(0, 0, 
+            ConvertCurveToHeightmap(new List<Vector2> (curve), resolution, maxHeight, shouldScaleMap));
     }
 
     
@@ -91,6 +104,24 @@ public class TerrainBezier : MonoBehaviour
 
         for (int i = 0; i<curve.Count; i++)
         {
+            //If it is before the start
+            if (i + 1 < curve.Count && curve[i].x < start.x && curve[i + 1].x > start.x)
+            {
+                float factor = (start.x - curve[i].x) / (curve[i + 1].x - curve[i].x);
+                newCurve.Add(GetPointInLine(curve[i], curve[i + 1], factor));
+
+                //Debug.Log("Before start " + (curve[i], curve[i+1]) + " " + (start,end) + " " + (factor, GetPointInLine(curve[i], curve[i + 1], factor)));
+            }
+
+            //If it is after the end
+            if (i -1 >= 0 && curve[i].x > end.x && curve[i - 1].x < end.x)
+            {
+                float factor = (end.x - curve[i-1].x) / (curve[i].x - curve[i-1].x);
+                newCurve.Add(GetPointInLine(curve[i-1], curve[i], factor));
+
+                //Debug.Log("After end " + (curve[i-1], curve[i]) + " " + (start, end) + " " + (factor,GetPointInLine(curve[i - 1], curve[i], factor)));
+            }
+
             if (curve[i].x >= start.x && curve[i].x <= end.x)
                 newCurve.Add(curve[i]);
         }
@@ -99,17 +130,32 @@ public class TerrainBezier : MonoBehaviour
     }
 
 
-    private List<Vector2> MergeAllPoints(List<Vector2> controlPoints, List<Vector2> baseControlPoints)
+    private List<Vector2> MergerCtrlPts(List<Vector2> controlPoints, List<Vector2> baseControlPoints)
     {
         List<Vector2> newControlPts = new List<Vector2>();
 
         for (int i = 0; i < baseControlPoints.Count-1; i++)
             newControlPts.Add(baseControlPoints[i]);
 
-        newControlPts.Add((baseControlPoints[baseControlPoints.Count - 1] + controlPoints[0]) / 2);
+
+        if (Mathf.Abs(baseControlPoints[baseControlPoints.Count -1].x - controlPoints[0].x) <= 0.1f)
+        {
+            //If the points are close together on the x-axis, take the averate
+            newControlPts.Add((baseControlPoints[baseControlPoints.Count - 1] + controlPoints[0]) / 2);
+        }
+        else
+        {
+            //If ther are too far, add both points
+            newControlPts.Add(baseControlPoints[baseControlPoints.Count - 1]);
+            //newControlPts.Add((baseControlPoints[baseControlPoints.Count - 1] + controlPoints[0]) / 2);
+            newControlPts.Add(controlPoints[0]);
+        }
 
         for (int i = 1; i < controlPoints.Count; i++)
             newControlPts.Add(controlPoints[i]);
+
+        //newControlPts.ForEach(e => Debug.Log(e));
+
         return newControlPts;
     }
 
@@ -119,7 +165,7 @@ public class TerrainBezier : MonoBehaviour
         DrawBezierCurve(Color.black, curve);
 
         DrawBezierCurve(new Color(1, 0.2f, 0.6f, 0.5f), newControlPts);
-        DrawBezierCurve(Color.red, newCurve);
+        //DrawBezierCurve(Color.red, newCurve);
 
         DrawBezierCurve(Color.green, baseControlPoints);
         DrawBezierCurve(Color.yellow, controlPoints);
@@ -162,11 +208,12 @@ public class TerrainBezier : MonoBehaviour
     }
 
     //Low level methods
-    private float[,] ConvertCurveToHeightmap(List<Vector2> curve, int resolution, int maxHeight)
+    private float[,] ConvertCurveToHeightmap(List<Vector2> curve, int resolution, int maxHeight, bool keepWorldScale)
     {
         float[,] heightmap = new float[resolution, resolution];
 
-        float xScale = resolution / (curve[curve.Count - 1].x - curve[0].x);
+        float xScale = 0;
+        xScale = keepWorldScale? resolution*1f/500 : resolution / (curve[curve.Count - 1].x - curve[0].x);
         float yScale = 1f / maxHeight;
 
         float xOffset = curve[0].x;
@@ -255,6 +302,7 @@ public class TerrainBezier : MonoBehaviour
 
         for (float i = 0; i <= 1; i += step)
         {
+            int startPointIndex = pointerIndex;// Mathf.Max(0, pointerIndex-2);
             int endPointerIndex = Mathf.Min(ctrlPts.Count-1, pointerIndex + localControlRadius);
 
             if (pointerIndex <ctrlPts.Count && i * distance > ctrlPts[endPointerIndex].x)
@@ -262,7 +310,7 @@ public class TerrainBezier : MonoBehaviour
 
             List<Vector2> localCtrlPts = new List<Vector2>();
 
-            for (int j = pointerIndex; j <= endPointerIndex; j++)
+            for (int j = startPointIndex; j <= endPointerIndex; j++)
             {
                 localCtrlPts.Add(ctrlPts[j]);
             }
@@ -270,9 +318,9 @@ public class TerrainBezier : MonoBehaviour
             //float factor = (i - ctrlPts[Mathf.Max(0, pointerIndex - localControlRadius)].x/distance) * distance 
             //                / (localCtrlPts[localCtrlPts.Count - 1].x - localCtrlPts[0].x);
 
-            Debug.Log("At: " + i + " Base: " + ctrlPts[Mathf.Max(0, pointerIndex - localControlRadius)].x / distance);
-            Debug.Log("Local Control Points: ");
-            localCtrlPts.ForEach(point => Debug.Log(point));
+            Debug.Log("At: " + i*distance + " Base: " + ctrlPts[Mathf.Max(0, pointerIndex - localControlRadius)].x / distance);
+            //Debug.Log("Local Control Points: ");
+            //localCtrlPts.ForEach(point => Debug.Log(point));
             //Debug.Log(" Factor: " + factor + " Pointer Index: " + pointerIndex);
 
             Vector2 newPoint = GetBSplinePoint(i*distance, localCtrlPts);
@@ -293,11 +341,13 @@ public class TerrainBezier : MonoBehaviour
         localCtrlPts.ForEach((point) => totalDistance += Mathf.Abs(point.x - x));
         localCtrlPts.ForEach(point => factorList.Add(GAUSSIAN(Mathf.Abs(point.x-x) / totalDistance)));
 
-        factorList = NORMALIZE_LIST(factorList);
+        List<float> normalizedFactorList = NORMALIZE_LIST(factorList);
 
-        for (int i=0; i < factorList.Count;i++)
+        for (int i=0; i < normalizedFactorList.Count;i++)
         {
-            y += localCtrlPts[i].y * factorList[i];
+            Debug.Log("List: " + localCtrlPts[i].x + " " + (localCtrlPts[i].y, normalizedFactorList[i], factorList[i]));
+
+            y += localCtrlPts[i].y * normalizedFactorList[i];
         }
 
         return new Vector2(x, y);
@@ -357,6 +407,7 @@ public class TerrainBezier : MonoBehaviour
 
     public static Vector2 GetPointInLine(Vector2 start, Vector2 end, float x)
     {
-        return (end - start).normalized * (x - start.x) + start;
+        return Vector2.Lerp(start, end, x);
+        //return (end - start).normalized * (x - start.x) + start;
     }
 }
