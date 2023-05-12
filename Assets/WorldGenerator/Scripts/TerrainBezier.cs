@@ -91,9 +91,9 @@ public class TerrainBezier : MonoBehaviour
         (int resolution, int maxHeight) = (terrain.terrainData.heightmapResolution, Mathf.RoundToInt(terrain.terrainData.heightmapScale.y));
 
         baseTerrain.terrainData.SetHeights(0, 0, 
-            ConvertCurveToHeightmap(new List<Vector2> (baseCurve), resolution, maxHeight, shouldScaleBaseMap));
+            ConvertCurveToHeightmap(new List<Vector2> (baseCurve), resolution, maxHeight, shouldScaleBaseMap, baseControlPoints[0].x));
         terrain.terrainData.SetHeights(0, 0, 
-            ConvertCurveToHeightmap(new List<Vector2> (curve), resolution, maxHeight, shouldScaleMap));
+            ConvertCurveToHeightmap(new List<Vector2> (curve), resolution, maxHeight, shouldScaleMap, controlPoints[0].x));
     }
 
     
@@ -144,8 +144,6 @@ public class TerrainBezier : MonoBehaviour
         if (distanceBetweenTiles >= maximumDistanceAllowed)
         {
             offset = new Vector2(maximumDistanceAllowed, 0);
-
-            newControlPts.Add(baseControlPoints[0]);  
         }
 
 
@@ -225,15 +223,14 @@ public class TerrainBezier : MonoBehaviour
     }
 
     //Low level methods
-    private float[,] ConvertCurveToHeightmap(List<Vector2> curve, int resolution, int maxHeight, bool keepWorldScale)
+    private float[,] ConvertCurveToHeightmap(List<Vector2> curve, int resolution, int maxHeight, bool keepWorldScale, float start)
     {
         float[,] heightmap = new float[resolution, resolution];
 
-        float xScale = 0;
-        xScale = keepWorldScale? resolution*1f/500 : resolution / (curve[curve.Count - 1].x - curve[0].x);
+        float xScale = keepWorldScale? resolution*1f/500 : resolution / (curve[curve.Count - 1].x - curve[0].x);
         float yScale = 1f / maxHeight;
 
-        float xOffset = curve[0].x;
+        float xOffset = start;
 
         for (int i=0; i<curve.Count; i++)
         {
