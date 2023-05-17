@@ -279,7 +279,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 2147483647
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!154 &128601619
 TerrainCollider:
   m_ObjectHideFlags: 0
@@ -643,7 +643,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 2147483647
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!154 &195490289
 TerrainCollider:
   m_ObjectHideFlags: 0
@@ -1250,7 +1250,7 @@ Light:
   m_Type: 1
   m_Shape: 0
   m_Color: {r: 1, g: 1, b: 1, a: 1}
-  m_Intensity: 5.43
+  m_Intensity: 6
   m_Range: 10
   m_SpotAngle: 30
   m_InnerSpotAngle: 21.80208
@@ -2050,7 +2050,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 2147483647
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!154 &1095380204
 TerrainCollider:
   m_ObjectHideFlags: 0
@@ -2855,6 +2855,7 @@ GameObject:
   - component: {fileID: 1486086934}
   - component: {fileID: 1486086933}
   - component: {fileID: 1486086932}
+  - component: {fileID: 1486086935}
   m_Layer: 0
   m_Name: Terrain (6)
   m_TagString: Untagged
@@ -2922,6 +2923,21 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 14
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1486086935
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1486086931}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: edeeb0995c01a3b4e9597da9fe62fe6f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  terrainBezier: {fileID: 1550516408}
+  terrain: {fileID: 1486086933}
+  defaultSplatIndex: 1
 --- !u!1 &1488348609
 GameObject:
   m_ObjectHideFlags: 0
@@ -3203,6 +3219,7 @@ GameObject:
   - component: {fileID: 1550516410}
   - component: {fileID: 1550516409}
   - component: {fileID: 1550516408}
+  - component: {fileID: 1550516412}
   m_Layer: 0
   m_Name: Terrain (5)
   m_TagString: Untagged
@@ -3225,33 +3242,27 @@ MonoBehaviour:
   terrain: {fileID: 1486086933}
   baseTerrain: {fileID: 1550516410}
   controlPoints:
-  - {x: 500, y: 0}
-  - {x: 550, y: 400}
-  - {x: 600, y: 50}
-  - {x: 650, y: 250}
-  - {x: 700, y: 400}
-  - {x: 750, y: 250}
-  - {x: 800, y: 300}
-  - {x: 850, y: 250}
-  - {x: 900, y: 200}
-  - {x: 950, y: 250}
-  - {x: 1000, y: 250}
+  - {x: 500, y: 500}
+  - {x: 600, y: 0}
+  - {x: 700, y: 200}
+  - {x: 800, y: 150}
+  - {x: 900, y: 300}
+  - {x: 1000, y: 50}
   baseControlPoints:
-  - {x: 0, y: 100}
-  - {x: 50, y: -100}
-  - {x: 100, y: 500}
-  - {x: 150, y: 200}
-  - {x: 200, y: 300}
-  - {x: 250, y: 500}
+  - {x: 0, y: 0}
+  - {x: 50, y: 400}
+  - {x: 100, y: 50}
+  - {x: 200, y: 0}
   - {x: 300, y: 200}
+  - {x: 350, y: 300}
   shouldScaleMap: 1
   shouldScaleBaseMap: 1
   step: 0.01
   g1Strength: 1
   gContinuityLevel: -1
-  shouldMerge: 1
+  shouldMerge: 0
   bSplineRadius: 4
-  distanceToMoveBezier: 0.3
+  distanceToMoveBezier: 0.294
 --- !u!154 &1550516409
 TerrainCollider:
   m_ObjectHideFlags: 0
@@ -3312,6 +3323,21 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 13
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1550516412
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1550516407}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: edeeb0995c01a3b4e9597da9fe62fe6f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  terrainBezier: {fileID: 1550516408}
+  terrain: {fileID: 1550516410}
+  defaultSplatIndex: 0
 --- !u!1 &1687297631
 GameObject:
   m_ObjectHideFlags: 0
@@ -3542,7 +3568,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 2147483647
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!154 &1896274797
 TerrainCollider:
   m_ObjectHideFlags: 0
@@ -3772,7 +3798,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 2147483647
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!154 &1924018730
 TerrainCollider:
   m_ObjectHideFlags: 0

@@ -94,6 +94,9 @@ public class TerrainBezier : MonoBehaviour
             ConvertCurveToHeightmap(new List<Vector2> (baseCurve), resolution, maxHeight, shouldScaleBaseMap, baseControlPoints[0].x));
         terrain.terrainData.SetHeights(0, 0, 
             ConvertCurveToHeightmap(new List<Vector2> (curve), resolution, maxHeight, shouldScaleMap, controlPoints[0].x));
+
+        baseTerrain.GetComponent<TerrainBezierColor>().GenerateTexture(shouldMerge);
+        terrain.GetComponent<TerrainBezierColor>().GenerateTexture(shouldMerge);
     }
 
     
