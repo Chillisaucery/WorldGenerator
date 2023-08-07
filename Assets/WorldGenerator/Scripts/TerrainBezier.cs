@@ -16,10 +16,10 @@ public class TerrainBezier : MonoBehaviour
     Terrain terrain, baseTerrain;
 
     [SerializeField]
-    List<Vector2> controlPoints = new List<Vector2>();
+    List<Vector2> baseControlPoints = new List<Vector2>();
 
     [SerializeField]
-    List<Vector2> baseControlPoints = new List<Vector2>();
+    List<Vector2> controlPoints = new List<Vector2>();
 
     [SerializeField]
     bool shouldScaleMap = false, shouldScaleBaseMap = false;

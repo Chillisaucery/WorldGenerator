@@ -1354,7 +1354,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!114 &438389874
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3241,26 +3241,29 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   terrain: {fileID: 1486086933}
   baseTerrain: {fileID: 1550516410}
-  controlPoints:
-  - {x: 500, y: 500}
-  - {x: 600, y: 0}
-  - {x: 700, y: 200}
-  - {x: 800, y: 150}
-  - {x: 900, y: 300}
-  - {x: 1000, y: 50}
   baseControlPoints:
   - {x: 0, y: 0}
   - {x: 50, y: 400}
   - {x: 100, y: 50}
   - {x: 200, y: 0}
-  - {x: 300, y: 200}
-  - {x: 350, y: 300}
+  - {x: 300, y: 500}
+  - {x: 350, y: 500}
+  - {x: 400, y: 350}
+  - {x: 500, y: 350}
+  controlPoints:
+  - {x: 500, y: 500}
+  - {x: 550, y: 450}
+  - {x: 600, y: 450}
+  - {x: 700, y: 200}
+  - {x: 800, y: 150}
+  - {x: 900, y: 300}
+  - {x: 1000, y: 50}
   shouldScaleMap: 1
   shouldScaleBaseMap: 1
-  step: 0.01
+  step: 0.02
   g1Strength: 1
   gContinuityLevel: -1
-  shouldMerge: 0
+  shouldMerge: 1
   bSplineRadius: 4
   distanceToMoveBezier: 0.294
 --- !u!154 &1550516409
