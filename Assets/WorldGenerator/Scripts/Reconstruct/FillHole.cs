@@ -20,6 +20,9 @@ public class FillHole : MonoBehaviour
     float _averageRadius = 0;
 
     List<(Vector3 v1, Vector3 v2)> _linesToDraw = new List<(Vector3 v1, Vector3 v2)> ();
+    public List<(Vector3 v1, Vector3 v2)> LinesToDraw { get => _linesToDraw;}
+
+    public List<List<Vector3>> GeneratedFaces = new List<List<Vector3>>();
 
 
 
@@ -120,10 +123,19 @@ public class FillHole : MonoBehaviour
             if (!isNearOtherInnerPoints && !isTooNearBoundaryPoints)
             {
                 generatedInnerPoints.Add(newCoord);
+
+                _linesToDraw.Add((point1, newCoord));
+                _linesToDraw.Add((point2, newCoord));
+                AddToGeneratedFaces(point1, point2, newCoord);
             }
         }
 
         return generatedInnerPoints;
+    }
+
+    private void AddToGeneratedFaces(Vector3 point1, Vector3 point2, Vector3 newCoord)
+    {
+        GeneratedFaces.Add(new List<Vector3>() { point1, point2, newCoord });
     }
 
     private List<Edge> GenerateInnerEdges(List<Vector3> points)
@@ -148,6 +160,28 @@ public class FillHole : MonoBehaviour
                 {
                     edges.Add(newEdge);
                     _linesToDraw.Add((points[i], otherPoints[0]));
+
+                    Vector3 middlePoint = (points[i] + otherPoints[0]) / 2;
+
+                    Vector3 closestPoint = Vector3.zero;
+                    float minDistance = Mathf.Infinity;
+
+                    foreach ((Vector3 point, int index) in _points)
+                        if (Vector3.Distance(point, middlePoint) < minDistance && point != points[i] && point != otherPoints[0])
+                        {
+                            closestPoint = point;
+                            minDistance = Vector3.Distance(point, middlePoint);
+                        }
+
+                    foreach (Vector3 point in _innerPoints)
+                        if (Vector3.Distance(point, middlePoint) < minDistance && point != points[i] && point != otherPoints[0])
+                        {
+                            closestPoint = point;
+                            minDistance = Vector3.Distance(point, middlePoint);
+                        }
+
+                    AddToGeneratedFaces(closestPoint, otherPoints[0], points[i]);
+
                     //Debug.Log("Added edge " + newEdge);
                     break;
                 }
@@ -191,6 +225,11 @@ public class FillHole : MonoBehaviour
             if (!isNearOtherInnerPoints && !isTooNearBoundaryPoints)
             {
                 generatedInnerPoints.Add(newCoord);
+
+                _linesToDraw.Add((_reconstruct.Mesh.vertices[point1], newCoord));
+                _linesToDraw.Add((_reconstruct.Mesh.vertices[point2], newCoord));
+
+                AddToGeneratedFaces(_reconstruct.Mesh.vertices[point1], newCoord, _reconstruct.Mesh.vertices[point2]);
             }
         }
 
@@ -198,6 +237,7 @@ public class FillHole : MonoBehaviour
     }
 
     int _iterationLeft = 5000;
+
     private List<int> ExtractBoundary(List<Edge> edges)
     {
         List<int> consideredPoints = new List<int> ();
@@ -240,6 +280,15 @@ public class FillHole : MonoBehaviour
         return (consideredPoints);
     }
 
+    public List<Vector3> GetAllPoints()
+    {
+        List<Vector3> allPoints = new List<Vector3>(_innerPoints);
+
+        _points.ForEach(point => allPoints.Add(point.coord));
+
+        return allPoints;
+    }
+
     private void OnDrawGizmos()
     {
         Gizmos.color = UnityEngine.Color.blue;
@@ -256,7 +305,7 @@ public class FillHole : MonoBehaviour
         {
             Vector3 point = _innerPoints[i];
             Gizmos.DrawSphere(point, 0.01f);
-            //Handles.Label(coord, i.ToString());
+            //Handles.Label(point, point.z.ToString());
         }
 
         foreach (var line in _linesToDraw)
