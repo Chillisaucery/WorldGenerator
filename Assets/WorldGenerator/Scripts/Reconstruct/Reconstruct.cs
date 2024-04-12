@@ -31,6 +31,22 @@ public class Reconstruct : MonoBehaviour
     {
         meshFilters = objectCollection.GetComponentsInChildren<MeshFilter>().ToList();
         BeginReconstruct();
+
+        switch (meshIndex) 
+        {
+            case (0):
+            case 1:
+                GetComponent<FillHole>().AdvancingStrength = 1f;
+                break;
+            case 2:
+                break;
+            case 3:
+                GetComponent<FillHole>().AdvancingStrength = 0.8f;
+                break;
+            case 4:
+            case 5:
+                break;
+        }
     }
 
 
@@ -74,6 +90,44 @@ public class Reconstruct : MonoBehaviour
         }*/
 
         List<Edge> boundaryEdges = _edgesTrisMap.Where(e => e.Value <= 1).ToDictionary(e => e.Key, e => e.Value).Keys.ToList();
+
+        Vector3 center = Vector3.zero;
+        int boundPointCount = 0;
+
+        foreach (Edge edge in boundaryEdges)
+        {
+            center += mesh.vertices[edge.vertex1];
+            center += mesh.vertices[edge.vertex2];
+
+            boundPointCount += 2;
+        }
+
+        center = center / boundPointCount;
+
+        Vector3 offset = new Vector3(meshIndex * 5, 0, 0);
+        center += offset;
+
+        float maxDistance = float.NegativeInfinity;
+        foreach (Edge edge in boundaryEdges)
+        {
+            float distanceV1 = Vector3.Distance(mesh.vertices[edge.vertex1], center);
+            float distanceV2 = Vector3.Distance(mesh.vertices[edge.vertex2], center);
+
+            if (maxDistance < distanceV1)
+                maxDistance = distanceV1;
+            if (maxDistance < distanceV2)
+                maxDistance = distanceV2;
+        }
+
+        boundaryEdges = boundaryEdges
+            .Where(edge => 
+                Vector3.Distance(mesh.vertices[edge.vertex1], center) <= maxDistance * 0.5f &&
+                Vector3.Distance(mesh.vertices[edge.vertex2], center) <= maxDistance * 0.5f)
+            .ToList();
+
+
+
+
         _boundaryEdges = boundaryEdges;
         //Remove all the vertex duplications
 
@@ -139,14 +193,14 @@ public class Reconstruct : MonoBehaviour
 
     private void OnDrawGizmos()
     {
-        /*Mesh mesh = meshFilters[meshIndex].sharedMesh;
+/*        Mesh mesh = meshFilters[meshIndex].sharedMesh;
 
         Gizmos.color = Color.black;
-*/
-        /*foreach (var edge in _edgesTrisMap)
+
+        foreach (var edge in _edgesTrisMap)
         {
             Gizmos.DrawLine(mesh.vertices[edge.Key.vertex1], mesh.vertices[edge.Key.vertex2]);
-        }*/
+        }
 
         Gizmos.color = Color.red;
         for (int i = 0; i < _points.Count; i++)
@@ -155,7 +209,7 @@ public class Reconstruct : MonoBehaviour
             int index = _points[i].index;
             Gizmos.DrawSphere(point, 0.01f);
             Handles.Label(point, index.ToString());
-        }
+        }*/
     }
 
     private static void AddConnectivity(Dictionary<Edge, int> edgesTrisMap, Edge edge)

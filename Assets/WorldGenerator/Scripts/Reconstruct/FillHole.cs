@@ -22,6 +22,9 @@ public class FillHole : MonoBehaviour
 
     List<(Vector3 v1, Vector3 v2)> _linesToDraw = new List<(Vector3 v1, Vector3 v2)> ();
     public List<(Vector3 v1, Vector3 v2)> LinesToDraw { get => _linesToDraw;}
+    public List<Vector3> InnerPoints { get => _innerPoints; }
+    public float AverageEdgeLength { get => _averageEdgeLength;}
+    public float AdvancingStrength { get => _advancingStrength; set => _advancingStrength = value; }
 
     public List<List<Vector3>> GeneratedFaces = new List<List<Vector3>>();
 
@@ -75,10 +78,17 @@ public class FillHole : MonoBehaviour
     private float CalculateAverageEdgeLength(List<Edge> boundaryEdges)
     {
         float sumLength = 0;
+        float minLength = Mathf.Infinity;
 
         foreach (Edge edge in boundaryEdges)
         {
-            sumLength += Vector3.Distance(_reconstruct.Mesh.vertices[edge.vertex1], _reconstruct.Mesh.vertices[edge.vertex2]);
+            float distance = Vector3.Distance(_reconstruct.Mesh.vertices[edge.vertex1], _reconstruct.Mesh.vertices[edge.vertex2]);
+            sumLength += distance;
+
+            if (minLength > distance)
+            {
+                minLength = distance;
+            }
         }
 
         return sumLength / boundaryEdges.Count;
@@ -309,7 +319,6 @@ public class FillHole : MonoBehaviour
                 
                 if (currentPoint == startingPoint)
                 {
-                    Debug.Log("Found a boundary " + consideredPoints.Count);
                     return (consideredPoints);
                 }
 
@@ -341,7 +350,7 @@ public class FillHole : MonoBehaviour
 
     private void OnDrawGizmos()
     {
-        Gizmos.color = UnityEngine.Color.blue;
+/*        Gizmos.color = UnityEngine.Color.blue;
         for (int i = 0; i < _points.Count; i++)
         {
             Vector3 point = _points[i].coord;
@@ -358,11 +367,11 @@ public class FillHole : MonoBehaviour
 
             //TODO: If there are fewer than 6 connections at this point, start connecting to the nearest points around. Especially the center
             //Handles.Label(point, point.z.ToString());
-        }
+        }*/
 
-        foreach (var line in _linesToDraw)
+        /*foreach (var line in _linesToDraw)
         {
             Gizmos.DrawLine(line.v1, line.v2);
-        }
+        }*/
     }
 }
