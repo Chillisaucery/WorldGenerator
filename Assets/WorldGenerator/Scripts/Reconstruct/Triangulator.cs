@@ -23,6 +23,9 @@ public class Triangulator : MonoBehaviour
     List<(Vector3 v1, Vector3 v2)> _innerBoundaryLines = new List<(Vector3 v1, Vector3 v2)> ();
     List<(Vector3 v1, Vector3 v2)> _outerBoundaryLines = new List<(Vector3 v1, Vector3 v2)>();
 
+    [HideInInspector]
+    public float Tolerance = 1;
+
 
 
     private void OnEnable()
@@ -238,7 +241,7 @@ public class Triangulator : MonoBehaviour
         Vector3 center = (point1 + point2) / 2;
         float radius = Vector3.Distance(point1, point2) / 2;
 
-        return otherPoints.Where(point => Vector3.Distance(point, center) < radius* 0.9f).ToList();    
+        return otherPoints.Where(point => Vector3.Distance(point, center) < radius * Tolerance).ToList();    
     }
 
 

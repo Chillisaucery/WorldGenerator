@@ -31,25 +31,8 @@ public class Reconstruct : MonoBehaviour
     {
         meshFilters = objectCollection.GetComponentsInChildren<MeshFilter>().ToList();
         BeginReconstruct();
-
-        switch (meshIndex) 
-        {
-            case (0):
-            case 1:
-                GetComponent<FillHole>().AdvancingStrength = 1f;
-                break;
-            case 2:
-                break;
-            case 3:
-                GetComponent<FillHole>().AdvancingStrength = 0.8f;
-                break;
-            case 4:
-            case 5:
-                break;
-        }
+        GenerateStrength();
     }
-
-
 
     public void BeginReconstruct()
     {
@@ -104,9 +87,6 @@ public class Reconstruct : MonoBehaviour
 
         center = center / boundPointCount;
 
-        Vector3 offset = new Vector3(meshIndex * 5, 0, 0);
-        center += offset;
-
         float maxDistance = float.NegativeInfinity;
         foreach (Edge edge in boundaryEdges)
         {
@@ -136,6 +116,37 @@ public class Reconstruct : MonoBehaviour
         //boundaryEdges.ForEach(e => Debug.Log("Vertex: " + (e.vertex1, e.vertex2)));
 
         ExtractPoints(mesh, boundaryEdges);
+    }
+
+    private void GenerateStrength()
+    {
+        switch (meshIndex)
+        {
+            case 0:
+                GetComponent<FillHole>().AdvancingStrength = 1f;
+                GetComponent<Triangulator>().Tolerance = 0.93f;
+                break;
+            case 1:
+                GetComponent<FillHole>().AdvancingStrength = 1f;
+                GetComponent<Triangulator>().Tolerance = 0.88f;
+                break;
+            case 2:
+                GetComponent<FillHole>().AdvancingStrength = 0.8f;
+                GetComponent<Triangulator>().Tolerance = 0.95f;
+                break;
+            case 3:
+                GetComponent<FillHole>().AdvancingStrength = 0.9f;
+                GetComponent<Triangulator>().Tolerance = 0.85f;
+                break;
+            case 4:
+                GetComponent<FillHole>().AdvancingStrength = 0.9f;
+                GetComponent<Triangulator>().Tolerance = 0.9f;
+                break;
+            case 5:
+                break;
+            default:
+                break;
+        }
     }
 
     private void ExtractPoints(Mesh mesh, List<Edge> boundaryEdges)

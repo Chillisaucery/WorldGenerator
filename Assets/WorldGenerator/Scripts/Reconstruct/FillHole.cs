@@ -13,7 +13,8 @@ using Edge = Reconstruct.Edge;
 public class FillHole : MonoBehaviour
 {
     [SerializeField] float _maximumParimeter = 10;
-    [SerializeField] [Range(0,1)] float _advancingStrength = 0.5f;
+    //[SerializeField] [Range(0,1)] 
+    float _advancingStrength = 0.5f;
     Reconstruct _reconstruct = null;
     List<(Vector3 coord, int index)> _points = new List<(Vector3 coord, int index)>();
     List<Vector3> _innerPoints = new List<Vector3>();
