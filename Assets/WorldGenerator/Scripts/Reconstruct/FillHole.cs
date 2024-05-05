@@ -121,6 +121,7 @@ public class FillHole : MonoBehaviour
         return totalRadius;
     }
 
+    public Vector3 Center = Vector3.zero;
     private List<Vector3> GenerateInnerPoints(List<Vector3> pointCoords, List<Edge> boundaryEdges)
     {
         //Find center
@@ -130,6 +131,7 @@ public class FillHole : MonoBehaviour
             center += point;
         }
         center = center / pointCoords.Count;
+        Center = center;
 
         //Generate inner points
         List<Edge> invalidEdges = new List<Edge>();
@@ -144,7 +146,7 @@ public class FillHole : MonoBehaviour
             Vector3 offset = (center - startingCoord).normalized * _averageEdgeLength * _advancingStrength;
             Vector3 newCoord = startingCoord + offset;
 
-            bool isNearOtherInnerPoints = generatedInnerPoints.Any(coord => Vector3.Distance(coord, newCoord) < _averageEdgeLength * _advancingStrength);
+            bool isNearOtherInnerPoints = generatedInnerPoints.Any(coord => Vector3.Distance(coord, newCoord) < _averageEdgeLength * _advancingStrength * 0.7f);
             bool isTooNearBoundaryPoints = pointCoords.Any(coord => Vector3.Distance(newCoord, coord) < _averageEdgeLength * _advancingStrength * 0.5f);
 
             if (!isNearOtherInnerPoints && !isTooNearBoundaryPoints)
@@ -224,11 +226,16 @@ public class FillHole : MonoBehaviour
             }
         }
 
-        _linesToDraw.Add((points[0], points[points.Count-1]));
+        if (points.Count > 0)
+        {
+            _linesToDraw.Add((points[0], points[points.Count - 1]));
+        }
 
         return edges;
     }
 
+    [HideInInspector]
+    public float InnerPointDistance = 1f;
     private List<Vector3> GenerateInnerPoint(List<int> pointIndexes, List<Edge> boundaryEdges)
     {
         //Find center
@@ -253,8 +260,9 @@ public class FillHole : MonoBehaviour
             Vector3 offset = (center - startingCoord).normalized * _averageEdgeLength * _advancingStrength;
             Vector3 newCoord = startingCoord + offset;
 
-            bool isNearOtherInnerPoints = generatedInnerPoints.Any(coord => Vector3.Distance(coord, newCoord) < _averageEdgeLength * _advancingStrength );
-            bool isTooNearBoundaryPoints = pointIndexes.Any(point => Vector3.Distance(newCoord, _reconstruct.Mesh.vertices[point]) < _averageEdgeLength * _advancingStrength * 0.5f);
+            bool isNearOtherInnerPoints = generatedInnerPoints.Any(coord => Vector3.Distance(coord, newCoord) < _averageEdgeLength * _advancingStrength * InnerPointDistance);
+            bool isTooNearBoundaryPoints = pointIndexes
+                .Any(point => Vector3.Distance(newCoord, _reconstruct.Mesh.vertices[point]) < _averageEdgeLength * _advancingStrength * 0.5f);
 
             if (!isNearOtherInnerPoints && !isTooNearBoundaryPoints)
             {

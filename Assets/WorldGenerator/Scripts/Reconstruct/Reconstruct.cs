@@ -26,6 +26,9 @@ public class Reconstruct : MonoBehaviour
     public List<(Vector3 coord, int index)> Points { get => _points; set => _points = value; }
     public List<Edge> BoundaryEdges { get => _boundaryEdges; set => _boundaryEdges = value; }
     public Mesh Mesh { get => _mesh; set => _mesh = value; }
+    public int MeshIndex { get => meshIndex; }
+
+
 
     private void OnEnable()
     {
@@ -111,7 +114,7 @@ public class Reconstruct : MonoBehaviour
         _boundaryEdges = boundaryEdges;
         //Remove all the vertex duplications
 
-        Debug.Log("Edge count: " + boundaryEdges.Count);    //Should be 65 for the cube
+        //Debug.Log("Edge count: " + boundaryEdges.Count);    //Should be 65 for the cube
 
         //boundaryEdges.ForEach(e => Debug.Log("Vertex: " + (e.vertex1, e.vertex2)));
 
@@ -125,28 +128,87 @@ public class Reconstruct : MonoBehaviour
             case 0:
                 GetComponent<FillHole>().AdvancingStrength = 1f;
                 GetComponent<Triangulator>().Tolerance = 0.93f;
+                GetComponent<Triangulator>().Seed = -1;
                 break;
             case 1:
-                GetComponent<FillHole>().AdvancingStrength = 1f;
-                GetComponent<Triangulator>().Tolerance = 0.88f;
+                GetComponent<FillHole>().AdvancingStrength = 0.9f;
+                GetComponent<FillHole>().InnerPointDistance = 0.75f;
+                GetComponent<Triangulator>().Tolerance = 0.92f;
+                GetComponent<Triangulator>().Seed = -1;
+                GetComponent<Triangulator>().FinalizeTolerance = 0.7f;
                 break;
             case 2:
                 GetComponent<FillHole>().AdvancingStrength = 0.8f;
                 GetComponent<Triangulator>().Tolerance = 0.95f;
+                GetComponent<Triangulator>().Seed = -1;
                 break;
             case 3:
                 GetComponent<FillHole>().AdvancingStrength = 0.9f;
-                GetComponent<Triangulator>().Tolerance = 0.85f;
+                GetComponent<Triangulator>().Tolerance = 0.95f;
+                GetComponent<Triangulator>().Seed = -1;
                 break;
             case 4:
                 GetComponent<FillHole>().AdvancingStrength = 0.9f;
                 GetComponent<Triangulator>().Tolerance = 0.9f;
+                GetComponent<Triangulator>().Seed = -1;
                 break;
             case 5:
+                GetComponent<FillHole>().AdvancingStrength = 1f;
+                GetComponent<FillHole>().InnerPointDistance = 0.5f;
+                GetComponent<Triangulator>().Tolerance = 0.95f;
+                GetComponent<Triangulator>().Seed = -1;
+                GetComponent<Triangulator>().FinalizeTolerance = 0.5f;
+                break;
+            case 7:
+                GetComponent<FillHole>().AdvancingStrength = 0.95f;
+                GetComponent<FillHole>().InnerPointDistance = 0.5f;
+                GetComponent<Triangulator>().Tolerance = 0.95f;
+                GetComponent<Triangulator>().Seed = -1;
+                GetComponent<Triangulator>().FinalizeTolerance = 0.75f;
+                break;
+            case 8:
+                GetComponent<FillHole>().AdvancingStrength = 1f;
+                GetComponent<FillHole>().InnerPointDistance = 0.5f;
+                GetComponent<Triangulator>().Tolerance = 0.95f;
+                GetComponent<Triangulator>().Seed = -1;
+                GetComponent<Triangulator>().FinalizeTolerance = 0.5f;
+                break;
+            case 9:
+                GetComponent<FillHole>().AdvancingStrength = 0.9f;
+                GetComponent<FillHole>().InnerPointDistance = 0.5f;
+                GetComponent<Triangulator>().Tolerance = 0.87f;
+                GetComponent<Triangulator>().Seed = -1;
+                GetComponent<Triangulator>().FinalizeTolerance = 0.5f;
                 break;
             default:
                 break;
         }
+    }
+    public void ExtractPoints()
+    {
+/*        List<int> vertexIndices = new List<int>();
+
+        foreach (Edge edge in boundaryEdges)
+        {
+            vertexIndices.Add(edge.vertex1);
+            vertexIndices.Add(edge.vertex2);
+        }
+
+        vertexIndices.Distinct();
+
+        _points.Clear();
+        foreach (int vertexIndex in vertexIndices)
+        {
+            _points.Add((mesh.vertices[vertexIndex] + meshFilters[meshIndex].transform.position, vertexIndex));
+        }
+
+        _points = _points.OrderBy(point => point.coord.x)
+                        .ThenBy(point => point.coord.y)
+                        .ThenBy(point => point.coord.z)
+                        .ToList();
+
+        //Remove duplications
+        List<(Vector3 coord, int index)> duplicatedPoints = new List<(Vector3 coord, int index)>();*/
     }
 
     private void ExtractPoints(Mesh mesh, List<Edge> boundaryEdges)
