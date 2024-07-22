@@ -139,8 +139,10 @@ public class Reconstruct : MonoBehaviour
                 break;
             case 2:
                 GetComponent<FillHole>().AdvancingStrength = 0.8f;
+                GetComponent<FillHole>().InnerPointDistance = 0.9f;
                 GetComponent<Triangulator>().Tolerance = 0.95f;
                 GetComponent<Triangulator>().Seed = -1;
+
                 break;
             case 3:
                 GetComponent<FillHole>().AdvancingStrength = 0.9f;
@@ -148,14 +150,14 @@ public class Reconstruct : MonoBehaviour
                 GetComponent<Triangulator>().Seed = -1;
                 break;
             case 4:
-                GetComponent<FillHole>().AdvancingStrength = 0.9f;
-                GetComponent<Triangulator>().Tolerance = 0.9f;
+                GetComponent<FillHole>().AdvancingStrength = 1.1f;
+                GetComponent<Triangulator>().Tolerance = 1f;
                 GetComponent<Triangulator>().Seed = -1;
                 break;
             case 5:
                 GetComponent<FillHole>().AdvancingStrength = 1f;
                 GetComponent<FillHole>().InnerPointDistance = 0.5f;
-                GetComponent<Triangulator>().Tolerance = 0.95f;
+                GetComponent<Triangulator>().Tolerance = 0.92f;
                 GetComponent<Triangulator>().Seed = -1;
                 GetComponent<Triangulator>().FinalizeTolerance = 0.5f;
                 break;

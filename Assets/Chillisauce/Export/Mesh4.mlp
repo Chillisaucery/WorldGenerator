@@ -1,0 +1,36 @@
+<!DOCTYPE MeshLabDocument>
+<MeshLabProject>
+ <MeshGroup>
+  <MLMesh idInFile="-1" visible="0" filename="Mesh4.obj" label="Mesh4.obj">
+   <MLMatrix44>
+1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 
+</MLMatrix44>
+   <RenderingOption pointColor="252 233 79 255" solidColor="192 192 192 255" wireWidth="1" wireColor="64 64 64 255" pointSize="3" boxColor="234 234 234 255">000111000000000000000100000001001100000010100000000100111011110000001001</RenderingOption>
+  </MLMesh>
+  <MLMesh idInFile="-1" visible="0" filename="Mesh4_Hole.obj" label="Mesh4_Hole.obj">
+   <MLMatrix44>
+1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 
+</MLMatrix44>
+   <RenderingOption pointColor="252 233 79 255" solidColor="192 192 192 255" wireWidth="1" wireColor="64 64 64 255" pointSize="3" boxColor="234 234 234 255">100001000000000000000100000001011101010010100000000100111011100000001001</RenderingOption>
+  </MLMesh>
+  <MLMesh idInFile="-1" visible="0" filename="Mesh4_Original.obj" label="Mesh4_Original.obj">
+   <MLMatrix44>
+1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 
+</MLMatrix44>
+   <RenderingOption pointColor="252 233 79 255" solidColor="192 192 192 255" wireWidth="1" wireColor="64 64 64 255" pointSize="3" boxColor="234 234 234 255">100001000000000000000100000001011101010010100000000100111011100000001001</RenderingOption>
+  </MLMesh>
+  <MLMesh idInFile="-1" visible="1" filename="Mesh4_Hole.obj" label="Mesh4_Hole(1).obj">
+   <MLMatrix44>
+1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 
+</MLMatrix44>
+   <RenderingOption pointColor="252 233 79 255" solidColor="192 192 192 255" wireWidth="1" wireColor="64 64 64 255" pointSize="3" boxColor="234 234 234 255">100001000000000000000100000001010101010010100000000100111011100000001001</RenderingOption>
+  </MLMesh>
+  <MLMesh idInFile="-1" visible="1" filename="Mesh4_Poisson.obj" label="Poisson mesh">
+   <MLMatrix44>
+1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 
+</MLMatrix44>
+   <RenderingOption pointColor="252 233 79 255" solidColor="192 192 192 255" wireWidth="1" wireColor="64 64 64 255" pointSize="3" boxColor="234 234 234 255">100001000000000000000000000001010100000010100000000100111011110000001001</RenderingOption>
+  </MLMesh>
+ </MeshGroup>
+ <RasterGroup/>
+</MeshLabProject>
