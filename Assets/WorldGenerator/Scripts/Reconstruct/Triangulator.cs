@@ -28,6 +28,9 @@ public class Triangulator : MonoBehaviour
     List<(Vector3 v1, Vector3 v2)> _innerBoundaryLines = new List<(Vector3 v1, Vector3 v2)> ();
     List<(Vector3 v1, Vector3 v2)> _outerBoundaryLines = new List<(Vector3 v1, Vector3 v2)>();
 
+    private Vector3 _center = Vector3.zero;
+    public Vector3 Center { get => _center; }
+
     [HideInInspector]
     public float Tolerance = 1;
 
@@ -50,6 +53,7 @@ public class Triangulator : MonoBehaviour
 
         //Find center
         Vector3 center = GetCenter();
+        _center = center;
 
         _linesToDraw.Clear();
         GenerateLines(center);
@@ -326,7 +330,7 @@ public class Triangulator : MonoBehaviour
                 Seed = Random.Range(0, 10000000);
             }
 
-            Debug.Log("Seed: " + Seed);
+            //Debug.Log("Seed: " + Seed);
             //Random.InitState(Seed);
 
             int index = Random.Range(0, innerBoundaryPoints.Count);
@@ -614,32 +618,32 @@ public class Triangulator : MonoBehaviour
 
     private void OnDrawGizmos()
     {
-        Gizmos.color = UnityEngine.Color.blue;
+/*        Gizmos.color = UnityEngine.Color.blue;
         for (int i = 0; i < Points.Count; i++)
         {
             Vector3 point = Points[i];
             Gizmos.DrawSphere(point, 0.01f);
             //Handles.Label(point, i.ToString());
-        }
-
-        Gizmos.color = UnityEngine.Color.cyan;
-        foreach (var line in _linesToDraw)
-        {
-            Gizmos.DrawLine(line.v1, line.v2);
-        }
-/*
-        Gizmos.color = UnityEngine.Color.yellow;
-        foreach (var line in _innerBoundaryLines)
-        {
-            Gizmos.DrawLine(line.v1, line.v2);
         }*/
 
-/*        Gizmos.color = UnityEngine.Color.green;
-        foreach (var line in _finalLines)
-        {
-            Gizmos.DrawLine(line.v1, line.v2);
-        }
-*/
+        /*        Gizmos.color = UnityEngine.Color.cyan;
+                foreach (var line in _linesToDraw)
+                {
+                    Gizmos.DrawLine(line.v1, line.v2);
+                }*/
+        /*
+                Gizmos.color = UnityEngine.Color.yellow;
+                foreach (var line in _innerBoundaryLines)
+                {
+                    Gizmos.DrawLine(line.v1, line.v2);
+                }*/
+
+        /*        Gizmos.color = UnityEngine.Color.green;
+                foreach (var line in _finalLines)
+                {
+                    Gizmos.DrawLine(line.v1, line.v2);
+                }
+        */
         /*        foreach (var line in _outerBoundaryLines)
                 {
                     Gizmos.DrawLine(line.v1, line.v2);
