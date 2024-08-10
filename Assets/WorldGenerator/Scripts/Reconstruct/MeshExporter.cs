@@ -13,7 +13,7 @@ public class MeshExporter : MonoBehaviour
     [SerializeField]
     MeshFilter _meshFilter;
 
-    Triangulator _triangulator;
+    CurvatureAdjust _curvatureAdjust;
     Reconstruct _reconstruct;
     List<Vector3> _allPoints = new List<Vector3> ();
 
@@ -21,13 +21,14 @@ public class MeshExporter : MonoBehaviour
 
     private void OnEnable()
     {
-        _triangulator = GetComponent<Triangulator>();
+        _curvatureAdjust = GetComponent<CurvatureAdjust>();
         _reconstruct = GetComponent<Reconstruct>();
+        var _triangulator = GetComponent<Triangulator>();
 
-        //List<Vector3> innerPoints = GetUniquePointsFromLines(_triangulator.LinesToDraw);
+        List<Vector3> innerPoints = GetUniquePointsFromLines(_triangulator.LinesToDraw);
 
         _allPoints.Clear();
-        _allPoints.AddRange(_triangulator.Points);
+        _allPoints.AddRange(_curvatureAdjust.Points);
         _allPoints.AddRange(_reconstruct.Mesh.vertices);
         _allPoints = _allPoints.Distinct().ToList();
 
@@ -36,7 +37,7 @@ public class MeshExporter : MonoBehaviour
         mesh.vertices = _allPoints.ToArray();
     }
 
-    /*List<Vector3> GetUniquePointsFromLines(List<(Vector3 v1, Vector3 v2)> lines)
+    List<Vector3> GetUniquePointsFromLines(List<(Vector3 v1, Vector3 v2)> lines)
     {
         HashSet<Vector3> uniquePointsSet = new HashSet<Vector3>();
 
@@ -51,5 +52,5 @@ public class MeshExporter : MonoBehaviour
         // Convert HashSet back to List
         List<Vector3> uniquePointsList = new List<Vector3>(uniquePointsSet);
         return uniquePointsList;
-    }*/
+    }
 }

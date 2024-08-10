@@ -618,19 +618,19 @@ public class Triangulator : MonoBehaviour
 
     private void OnDrawGizmos()
     {
-/*        Gizmos.color = UnityEngine.Color.blue;
-        for (int i = 0; i < Points.Count; i++)
-        {
-            Vector3 point = Points[i];
-            Gizmos.DrawSphere(point, 0.01f);
-            //Handles.Label(point, i.ToString());
-        }*/
-
-        /*        Gizmos.color = UnityEngine.Color.cyan;
-                foreach (var line in _linesToDraw)
+        /*        Gizmos.color = UnityEngine.Color.blue;
+                for (int i = 0; i < Points.Count; i++)
                 {
-                    Gizmos.DrawLine(line.v1, line.v2);
+                    Vector3 point = Points[i];
+                    Gizmos.DrawSphere(point, 0.01f);
+                    //Handles.Label(point, i.ToString());
                 }*/
+
+        Gizmos.color = UnityEngine.Color.cyan;
+        foreach (var line in _linesToDraw)
+        {
+            Gizmos.DrawLine(line.v1, line.v2);
+        }
         /*
                 Gizmos.color = UnityEngine.Color.yellow;
                 foreach (var line in _innerBoundaryLines)
